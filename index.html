@@ -23,7 +23,7 @@
         .interactive { pointer-events: auto; cursor: pointer; transition: transform 0.1s; }
         .interactive:active { transform: scale(0.95); }
         
-        .ui-layer { position: absolute; inset: 0; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; padding: max(20px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(80px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left)); }
+        .ui-layer { position: absolute; inset: 0; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; padding: max(20px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(100px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left)); }
         
         /* EXPLORE UI */
         #explore-ui { z-index: 20; }
@@ -249,7 +249,7 @@
 
         function buildCreatureMesh(species) {
             const group = new THREE.Group(); const visGroup = new THREE.Group(); group.add(visGroup);
-            const shadow = new THREE.Mesh(SHARED_GEOS.plane, SHARED_MATS.shadow); shadow.rotation.x = -Math.PI / 2; shadow.position.y = 0.01; shadow.visible = false; group.add(shadow);
+            // Shadow removed - directional light casts real shadow on ground
             let bGeo = SHARED_GEOS.bodySquash; if(species === 'Flamey') bGeo = SHARED_GEOS.bodyTall; else if(species === 'Rocky') bGeo = SHARED_GEOS.bodyWide;
             
             const body = new THREE.Mesh(bGeo, SHARED_MATS.body[species]); body.position.y = 0.425; body.castShadow = true; visGroup.add(body);
@@ -268,7 +268,7 @@
             
             const footMat = SHARED_MATS.foot[species]; const feet = [];
             [{x:-0.25, z:0.25}, {x:0.25, z:0.25}, {x:-0.25, z:-0.25}, {x:0.25, z:-0.25}].forEach(pos => { const foot = new THREE.Mesh(SHARED_GEOS.foot, footMat); foot.position.set(pos.x, 0.09, pos.z); foot.castShadow = true; group.add(foot); feet.push(foot); });
-            group.userData = { visGroup, leftEye, rightEye, accGroup, feet, shadow }; return group;
+            group.userData = { visGroup, leftEye, rightEye, accGroup, feet }; return group;
         }
 
         /* =========================================================
@@ -529,7 +529,7 @@
             }
             if (!ud.blinkTimer) ud.blinkTimer = 3.0; ud.blinkTimer -= dt;
             if (ud.blinkTimer <= 0) { if(ud.leftEye) ud.leftEye.scale.y = 0.1; if(ud.rightEye) ud.rightEye.scale.y = 0.1; if (ud.blinkTimer <= -0.1) { if(ud.leftEye) ud.leftEye.scale.y = 1; if(ud.rightEye) ud.rightEye.scale.y = 1; ud.blinkTimer = 2 + Math.random() * 4; } }
-            if (gameState === 'EXPLORE' && ud.shadow) { ud.shadow.visible = true; ud.shadow.position.y = -model.position.y + 0.01; const dy = Math.max(0, model.position.y); ud.shadow.material.opacity = Math.max(0.02, 0.15 - (dy * 0.06)); ud.shadow.scale.setScalar(Math.max(0.4, 1 - (dy * 0.15))); } else if (ud.shadow) { ud.shadow.visible = false; }
+            // Shadow removed - directional light handles real shadows
         }
 
         function animate() {
